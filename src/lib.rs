@@ -1,4 +1,4 @@
-mod parser;
+pub mod parser;
 pub mod tokenizer;
 
 use std::vec::Vec;
@@ -23,9 +23,9 @@ fn deserialize(serialized: String) -> Result<Node, parser::ParserError> {
     parser::parse(tokens)
 }
 
-pub fn prettify(serialized: String) -> String {
-    let root = deserialize(serialized).expect("Could not parse input");
-    node_to_lines(&root).join("\n")
+pub fn prettify(serialized: String) -> Result<String, parser::ParserError> {
+    let root = deserialize(serialized)?;
+    Ok(node_to_lines(&root).join("\n"))
 }
 
 pub fn node_to_lines(node: &Node) -> Vec<String> {

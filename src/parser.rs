@@ -26,7 +26,7 @@ fn parse_iter(token_iter: &mut vec::IntoIter<Token>) -> Result<Vec<Node>, Parser
                     let mut children = parse_iter(token_iter)?;
                     node.children.append(&mut children);
                 } else {
-                    return Err(ParserError::InvalidSeqError);
+                    return Err(ParserError::MissingNameError);
                 }
             }
             Token::ParenClose => {
@@ -46,7 +46,7 @@ fn parse_iter(token_iter: &mut vec::IntoIter<Token>) -> Result<Vec<Node>, Parser
 #[derive(Debug, PartialEq)]
 pub enum ParserError {
     EmptyTokenSeqError,
-    InvalidSeqError,
+    MissingNameError,
     MultipleRootsError,
 }
 
@@ -57,7 +57,7 @@ impl fmt::Display for ParserError {
 
         match self {
             &EmptyTokenSeqError => write!(f, "token sequence cannot be empty"),
-            &InvalidSeqError => write!(f, "token sequence must be valid"),
+            &MissingNameError => write!(f, "token sequence must be valid"),
             &MultipleRootsError => write!(f, "must have one root node"),
         }
     }
