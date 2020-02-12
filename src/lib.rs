@@ -1,5 +1,6 @@
 mod lisplike;
 mod json;
+mod json_properties;
 
 use std::vec::Vec;
 use std::str::FromStr;
@@ -22,6 +23,7 @@ impl Node {
 pub enum InputFormat {
     LispLike,
     Json,
+    JsonProperties
 }
 
 impl FromStr for InputFormat {
@@ -31,6 +33,7 @@ impl FromStr for InputFormat {
         match s {
             "lisp" => Ok(InputFormat::LispLike),
             "json" => Ok(InputFormat::Json),
+            "jsonprop" => Ok(InputFormat::JsonProperties),
             _ => Err("invalid format type"),
         }
     }
@@ -48,6 +51,7 @@ pub fn prettify(serialized: String, format: InputFormat) -> Result<String, Error
     let root = match format {
         InputFormat::LispLike => lisplike::deserialize(serialized),
         InputFormat::Json => json::deserialize(serialized),
+        InputFormat::JsonProperties => json_properties::deserialize(serialized)
     }?;
     Ok(node_to_lines(&root).join("\n"))
 }
