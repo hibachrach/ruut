@@ -13,3 +13,4 @@ path = "src/lib.rs"
 [dependencies]
 structopt = "0.2.10"
 exitcode = "1.1.2"
+serde_json = "1.0"

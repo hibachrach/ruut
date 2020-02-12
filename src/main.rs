@@ -37,11 +37,15 @@ fn main() {
                 std::process::exit(exitcode::USAGE);
             }
             Err(Error::MissingNameError) => {
-                eprintln!("Error: invalid input -- note that every open parenthesis must have a name before it");
+                eprintln!("Error: invalid input -- an item is missing a name");
                 std::process::exit(exitcode::DATAERR);
             }
             Err(Error::MultipleRootsError) => {
                 eprintln!("Error: invalid input -- must only have one root in structure");
+                std::process::exit(exitcode::DATAERR);
+            }
+            Err(Error::FormatSpecificError(error_msg)) => {
+                eprintln!("Error: invalid input -- {}", error_msg);
                 std::process::exit(exitcode::DATAERR);
             }
         }
