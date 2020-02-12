@@ -1,7 +1,7 @@
-pub mod parser;
-pub mod tokenizer;
+mod lisplike;
 
 use std::vec::Vec;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub struct Node {
@@ -18,13 +18,32 @@ impl Node {
     }
 }
 
-fn deserialize(serialized: String) -> Result<Node, parser::ParserError> {
-    let tokens = tokenizer::tokenize(&serialized);
-    parser::parse(tokens)
+pub enum InputFormat {
+    LispLike,
 }
 
-pub fn prettify(serialized: String) -> Result<String, parser::ParserError> {
-    let root = deserialize(serialized)?;
+impl FromStr for InputFormat {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "lisp" => Ok(InputFormat::LispLike),
+            _ => Err("invalid format type"),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Error {
+    EmptyInputError,
+    MissingNameError,
+    MultipleRootsError,
+}
+
+pub fn prettify(serialized: String, format: InputFormat) -> Result<String, Error> {
+    let root = match format {
+        InputFormat::LispLike => lisplike::deserialize(serialized)
+    }?;
     Ok(node_to_lines(&root).join("\n"))
 }
 
