@@ -1,5 +1,5 @@
+use super::super::{Error, Node};
 use super::tokenizer::Token;
-use super::super::{ Node, Error };
 use std::vec;
 
 pub fn parse(tokens: Vec<Token>) -> Result<Node, Error> {

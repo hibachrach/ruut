@@ -1,9 +1,9 @@
-mod lisplike;
 mod json;
 mod json_properties;
+mod lisplike;
 
-use std::vec::Vec;
 use std::str::FromStr;
+use std::vec::Vec;
 
 #[derive(Debug, PartialEq)]
 pub struct Node {
@@ -23,7 +23,7 @@ impl Node {
 pub enum InputFormat {
     LispLike,
     Json,
-    JsonProperties
+    JsonProperties,
 }
 
 impl FromStr for InputFormat {
@@ -51,7 +51,7 @@ pub fn prettify(serialized: String, format: InputFormat) -> Result<String, Error
     let root = match format {
         InputFormat::LispLike => lisplike::deserialize(serialized),
         InputFormat::Json => json::deserialize(serialized),
-        InputFormat::JsonProperties => json_properties::deserialize(serialized)
+        InputFormat::JsonProperties => json_properties::deserialize(serialized),
     }?;
     Ok(node_to_lines(&root).join("\n"))
 }

@@ -17,10 +17,10 @@ pub fn deserialize(serialized: String) -> Result<Node, Error> {
                 let root_obj = vec.iter().next().unwrap();
                 json_value_to_node(root_obj)?.ok_or(Error::EmptyInputError)
             }
-        },
+        }
         root_obj @ JsonValue::Object(_) => {
             json_value_to_node(&root_obj)?.ok_or(Error::EmptyInputError)
-        },
+        }
         _ => Err(Error::FormatSpecificError(
             "root item must be a root object or an array containing a root object".to_string(),
         )),
@@ -33,15 +33,11 @@ fn json_value_to_node(value: &JsonValue) -> Result<Option<Node>, Error> {
             Some(name_value) => match name_value {
                 JsonValue::String(name) => {
                     let children = match map.get("children") {
-                        Some(
-                            JsonValue::Object(children_json_values),
-                        ) => children_json_values
+                        Some(JsonValue::Object(children_json_values)) => children_json_values
                             .values()
                             .map(|value| json_value_to_node(value))
                             .collect::<Result<Vec<_>, _>>(),
-                        Some(
-                            JsonValue::Array(children_json_values)
-                        ) => children_json_values
+                        Some(JsonValue::Array(children_json_values)) => children_json_values
                             .iter()
                             .map(|value| json_value_to_node(value))
                             .collect::<Result<Vec<_>, _>>(),
@@ -53,9 +49,11 @@ fn json_value_to_node(value: &JsonValue) -> Result<Option<Node>, Error> {
                         children: children.into_iter().filter_map(|node| node).collect(),
                     }))
                 }
-                _ => Err(Error::FormatSpecificError("`name` must be a string".to_string())),
+                _ => Err(Error::FormatSpecificError(
+                    "`name` must be a string".to_string(),
+                )),
             },
-            None => Err(Error::MissingNameError)
+            None => Err(Error::MissingNameError),
         },
         _ => Ok(None),
     }

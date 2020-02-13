@@ -19,7 +19,9 @@ pub fn deserialize(serialized: String) -> Result<Node, Error> {
                 Ok(json_value_to_node(root_entry.0.to_string(), root_entry.1))
             }
         }
-        _ => Err(Error::FormatSpecificError("root item must be an object".to_string())),
+        _ => Err(Error::FormatSpecificError(
+            "root item must be an object".to_string(),
+        )),
     }
 }
 
