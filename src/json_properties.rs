@@ -35,18 +35,18 @@ fn json_value_to_node(value: &JsonValue) -> Result<Option<Node>, Error> {
                     let children = match map.get("children") {
                         Some(JsonValue::Object(children_json_values)) => children_json_values
                             .values()
-                            .map(|value| json_value_to_node(value))
+                            .flat_map(|value| Result::transpose(json_value_to_node(value)))
                             .collect::<Result<Vec<_>, _>>(),
                         Some(JsonValue::Array(children_json_values)) => children_json_values
                             .iter()
-                            .map(|value| json_value_to_node(value))
+                            .flat_map(|value| Result::transpose(json_value_to_node(value)))
                             .collect::<Result<Vec<_>, _>>(),
                         None => Ok(vec![]),
                         _ => Ok(vec![]),
                     }?;
                     Ok(Some(Node {
                         name: name.to_string(),
-                        children: children.into_iter().filter_map(|node| node).collect(),
+                        children: children,
                     }))
                 }
                 _ => Err(Error::FormatSpecificError(
