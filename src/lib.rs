@@ -12,9 +12,9 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn new<'a>(name: String) -> Node {
+    pub fn new(name: String) -> Node {
         Node {
-            name: name,
+            name,
             children: vec![],
         }
     }

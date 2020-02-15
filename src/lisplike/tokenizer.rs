@@ -19,7 +19,7 @@ pub fn tokenize(serialized: &str) -> Vec<Token> {
             if cur_name.trim().is_empty() {
                 // Previous name token is just whitespace
                 cur_name = String::from("");
-            } else if cur_name.len() > 0 {
+            } else if !cur_name.is_empty() {
                 // This is the end of the last name token
                 tokens.push(Token::Name(cur_name.trim().to_string()));
                 cur_name = String::from("");
@@ -40,7 +40,7 @@ pub fn tokenize(serialized: &str) -> Vec<Token> {
             }
         }
     }
-    if cur_name.len() > 0 {
+    if !cur_name.is_empty() {
         tokens.push(Token::Name(cur_name));
     }
     tokens

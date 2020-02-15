@@ -3,7 +3,7 @@ use serde_json;
 use serde_json::Value as JsonValue;
 
 pub fn deserialize(serialized: String) -> Result<Node, Error> {
-    if serialized.trim().len() == 0 {
+    if serialized.trim().is_empty() {
         return Err(Error::EmptyInputError);
     }
     let root_value: JsonValue = serde_json::from_str(&serialized)?;
@@ -11,7 +11,7 @@ pub fn deserialize(serialized: String) -> Result<Node, Error> {
         JsonValue::Array(vec) => {
             if vec.len() > 1 {
                 Err(Error::MultipleRootsError)
-            } else if vec.len() == 0 {
+            } else if vec.is_empty() {
                 Err(Error::EmptyInputError)
             } else {
                 let root_obj = vec.iter().next().unwrap();
@@ -46,7 +46,7 @@ fn json_value_to_node(value: &JsonValue) -> Result<Option<Node>, Error> {
                     }?;
                     Ok(Some(Node {
                         name: name.to_string(),
-                        children: children,
+                        children,
                     }))
                 }
                 _ => Err(Error::FormatSpecificError(
