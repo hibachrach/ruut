@@ -1,6 +1,8 @@
-pub mod parser;
-pub mod tokenizer;
+mod json;
+mod json_properties;
+mod lisplike;
 
+use std::str::FromStr;
 use std::vec::Vec;
 
 #[derive(Debug, PartialEq)]
@@ -18,13 +20,39 @@ impl Node {
     }
 }
 
-fn deserialize(serialized: String) -> Result<Node, parser::ParserError> {
-    let tokens = tokenizer::tokenize(&serialized);
-    parser::parse(tokens)
+pub enum InputFormat {
+    LispLike,
+    Json,
+    JsonProperties,
 }
 
-pub fn prettify(serialized: String) -> Result<String, parser::ParserError> {
-    let root = deserialize(serialized)?;
+impl FromStr for InputFormat {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "lisp" => Ok(InputFormat::LispLike),
+            "json" => Ok(InputFormat::Json),
+            "jsonprop" => Ok(InputFormat::JsonProperties),
+            _ => Err("invalid format type"),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Error {
+    EmptyInputError,
+    MissingNameError,
+    MultipleRootsError,
+    FormatSpecificError(String),
+}
+
+pub fn prettify(serialized: String, format: InputFormat) -> Result<String, Error> {
+    let root = match format {
+        InputFormat::LispLike => lisplike::deserialize(serialized),
+        InputFormat::Json => json::deserialize(serialized),
+        InputFormat::JsonProperties => json_properties::deserialize(serialized),
+    }?;
     Ok(node_to_lines(&root).join("\n"))
 }
 

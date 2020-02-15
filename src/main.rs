@@ -1,6 +1,5 @@
 use exitcode;
-use ruut::parser::ParserError;
-use ruut::prettify;
+use ruut::{prettify, Error, InputFormat};
 use std::io::{self, BufRead};
 use structopt::StructOpt;
 
@@ -10,6 +9,8 @@ struct Cli {
     /// Take input from stdin
     #[structopt(short = "i", long = "stdin")]
     take_from_stdin: bool,
+    #[structopt(short, long, default_value = "lisp")]
+    format: InputFormat,
 }
 
 fn main() {
@@ -29,18 +30,22 @@ fn main() {
         }
     };
     if let Some(st) = serialized_tree {
-        match prettify(st) {
+        match prettify(st, args.format) {
             Ok(prettified) => println!("{}", prettified),
-            Err(ParserError::EmptyTokenSeqError) => {
+            Err(Error::EmptyInputError) => {
                 eprintln!("Error: empty input -- structure must be passed as the first argument or via stdin");
                 std::process::exit(exitcode::USAGE);
             }
-            Err(ParserError::MissingNameError) => {
-                eprintln!("Error: invalid input -- note that every open parenthesis must have a name before it");
+            Err(Error::MissingNameError) => {
+                eprintln!("Error: invalid input -- an item is missing a name");
                 std::process::exit(exitcode::DATAERR);
             }
-            Err(ParserError::MultipleRootsError) => {
+            Err(Error::MultipleRootsError) => {
                 eprintln!("Error: invalid input -- must only have one root in structure");
+                std::process::exit(exitcode::DATAERR);
+            }
+            Err(Error::FormatSpecificError(error_msg)) => {
+                eprintln!("Error: invalid input -- {}", error_msg);
                 std::process::exit(exitcode::DATAERR);
             }
         }
