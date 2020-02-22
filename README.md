@@ -43,6 +43,11 @@ $ echo 'Parent (Child 1, Child 2 (Grandchild 1, Grandchild 2), Child 3)' | ruut 
 
 ## Installation
 
+### Download from GitHub
+
+Grab the newest published version from the [Releases section][ruut-releases] of
+this repo.
+
 ### With `cargo`
 
 1. [Install `rust` with `rustup`][rustup-instructions]
@@ -175,3 +180,4 @@ names are ignored:
 [tree-wiki]: https://en.wikipedia.org/wiki/Tree_(command) 
 [lisp-parser-python]: https://norvig.com/lispy.html
 [rustup-instructions]: https://rustup.rs/
+[ruut-releases]: https://github.com/HarrisonB/ruut/releases
