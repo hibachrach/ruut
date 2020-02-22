@@ -7,6 +7,27 @@ cache:
   directories:
     - /home/travis/.cargo
 
+GH_TOKEN: &GH_TOKEN
+  secure: RqLIGJ1wRkroxpNXZ4RjHE8YuY44h3L7mRAy8hV77Mthx9BYkY8ZJgbcKXaAlQLZzkdj0MWPUHEcATzJ7zDaynS9BevNNIZ3wIvGVwY1Aj86a1ujkIu1AUwjybBOD+uQbyVKCih47Qv8HaeM6+iGIW8zf01zrIq9+/BXvwXI+y3/aNppNj0nLgz/GCeOcWewuNS23hsknG8hweSUg8lkJgbvabB3/NQTyME4OdDlWPd8af0FcyQ9Zt1KT8lYqBK3DujvCbina7dg9YpgAuItxgLwl2T9vumPq1mD5bHPnn8y74uV5XvNXsMNKEB0VrHngj6rVvZAqYerVNYPQ7+WlEOVLykuGTfCCZrpwm9dT4v5PUwZyBu4V3tBOdtFuF4F4uByYOlrnF4XrSsHafNrv12hsIPahdEnDEn0ZMuV8+ez93vxX+Tx2Dl/eUtzim69V2VMZbVyxCygwqOnFT3W5vqkpspKYw9wvfcSZzGljlVxXy8gugqqYvLFOSkDzCVDIo3va3cC31LO4CEDb7dqI4FqLKhWhyOzwQ27uBVe9hFSA+CY6ikMDvU2MdCPTz7lsyoHNwpaySaKe1XenYai8pswTeDfMWOwG01jr2BMMk2TSbPPiv/DNGRX/f7c2JaGb4HxjwSH2TlU1UqOC2DmnqYJoRmf1433Q06cMOqM0m8
+
+DEPLOY_TO_GITHUB: &DEPLOY_TO_GITHUB
+  before_deploy:
+    - git config --local user.name "Harrison Bachrach"
+    - git config --local user.email "harrison.bachrach@gmail.com"
+    - name="ruut-$TRAVIS_TAG-$TARGET"
+    - mkdir $name
+    - cp target/$TARGET/release/ruut $name/
+    - cp README.md LICENSE $name/
+    - tar czvf $name.tar.gz $name
+  deploy:
+    provider: releases
+    api_key: *GH_TOKEN
+    file: ruut-$TRAVIS_TAG-$TARGET.tar.gz
+    skip_cleanup: true
+    on:
+      branch: master
+      tags: true
+
 matrix:
   include:
 
@@ -24,6 +45,7 @@ matrix:
     rust: stable
     before_script: rustup target add $TARGET
     script: cargo build --release --target $TARGET --locked
+    <<: *DEPLOY_TO_GITHUB
 
   - name: macOS Binary
     env: MACOSX_DEPLOYMENT_TARGET=10.7 TARGET=x86_64-apple-darwin
@@ -31,6 +53,7 @@ matrix:
     rust: stable
     script: cargo build --release --target $TARGET --locked
     install: true
+    <<: *DEPLOY_TO_GITHUB
 
 notifications:
   email:
