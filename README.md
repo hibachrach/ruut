@@ -2,7 +2,7 @@
 
 ## Why
 
-I deal with folder structures a lot for work at @DocSend. I also love the
+I deal with folder structures a lot for work at [DocSend][docsend]. I also love the
 output of [`tree(1)`][tree-wiki] for talking about folder structures.
 
 Unfortunately, most of the time I'm not talking about folder structures on my
@@ -177,6 +177,7 @@ names are ignored:
 }
 ```
 
+[docsend]: https://www.docsend.com/
 [tree-wiki]: https://en.wikipedia.org/wiki/Tree_(command) 
 [lisp-parser-python]: https://norvig.com/lispy.html
 [rustup-instructions]: https://rustup.rs/
