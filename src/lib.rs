@@ -47,11 +47,18 @@ pub enum Error {
     FormatSpecificError(String),
 }
 
-pub fn prettify(serialized: String, format: InputFormat) -> Result<String, Error> {
+pub fn prettify(
+    serialized: String,
+    format: InputFormat,
+    name_key: String,
+    children_key: String,
+) -> Result<String, Error> {
     let root = match format {
         InputFormat::LispLike => lisplike::deserialize(serialized),
         InputFormat::Json => json::deserialize(serialized),
-        InputFormat::JsonProperties => json_properties::deserialize(serialized),
+        InputFormat::JsonProperties => {
+            json_properties::deserialize(serialized, name_key, children_key)
+        }
     }?;
     Ok(node_to_lines(&root).join("\n"))
 }

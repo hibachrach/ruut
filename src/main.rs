@@ -11,6 +11,14 @@ struct Cli {
     take_from_stdin: bool,
     #[structopt(short, long, default_value = "lisp")]
     format: InputFormat,
+    /// The property containing the name of the given node
+    /// (only applies to `jsonprop` format)
+    #[structopt(short, long, default_value = "name")]
+    name: String,
+    /// The property containing the children of the given node
+    /// (only applies to `jsonprop` format)
+    #[structopt(short, long, default_value = "children")]
+    children: String,
 }
 
 fn main() {
@@ -30,7 +38,7 @@ fn main() {
         }
     };
     if let Some(st) = serialized_tree {
-        match prettify(st, args.format) {
+        match prettify(st, args.format, args.name, args.children) {
             Ok(prettified) => println!("{}", prettified),
             Err(Error::EmptyInputError) => {
                 eprintln!("Error: empty input -- structure must be passed as the first argument or via stdin");
