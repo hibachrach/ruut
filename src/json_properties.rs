@@ -123,6 +123,40 @@ mod tests {
     #[test]
     fn good_json() {
         let json = r#"
+            {
+                "name": "big root boy",
+                "children": [
+                    {
+                        "name": "me, the bean man"
+                    },
+                    {
+                        "name": "another child of beans"
+                    }
+                ]
+            }
+        "#;
+        let root_node = deserialize(json.to_string()).unwrap();
+        assert_eq!(
+            root_node,
+            Node {
+                name: "big root boy".to_string(),
+                children: vec![
+                    Node {
+                        name: "me, the bean man".to_string(),
+                        children: vec![]
+                    },
+                    Node {
+                        name: "another child of beans".to_string(),
+                        children: vec![]
+                    }
+                ]
+            }
+        );
+    }
+
+    #[test]
+    fn good_json_arr() {
+        let json = r#"
             [{
                 "name": "big root boy",
                 "children": [
