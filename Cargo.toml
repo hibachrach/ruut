@@ -5,6 +5,7 @@ authors = ["Harry Bachrach <harrison.bachrach@gmail.com>"]
 edition = "2018"
 license = "MIT"
 description = "Make easy-to-type and easy-to-grab folder structures easy to read"
+repository = "https://github.com/HarrisonB/ruut"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
