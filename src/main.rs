@@ -6,9 +6,6 @@ use structopt::StructOpt;
 #[derive(StructOpt)]
 struct Cli {
     serialized_tree: Option<String>,
-    /// Take input from stdin
-    #[structopt(short = "i", long = "stdin")]
-    take_from_stdin: bool,
     #[structopt(short, long, default_value = "lisp")]
     format: InputFormat,
     /// The property containing the name of the given node
@@ -24,18 +21,12 @@ struct Cli {
 fn main() {
     let args = Cli::from_args();
     let stdin = io::stdin();
-    let serialized_tree = match args.serialized_tree {
-        Some(st) => Some(st),
-        None => {
-            if args.take_from_stdin {
-                match stdin.lock().lines().next() {
-                    Some(Ok(first_line_of_stdin)) => Some(first_line_of_stdin),
-                    _ => None,
-                }
-            } else {
-                None
-            }
-        }
+    let serialized_tree = if let st_arg @ Some(_) = args.serialized_tree {
+        st_arg
+    } else if let Some(Ok(first_line_of_stdin)) = stdin.lock().lines().next() {
+        Some(first_line_of_stdin)
+    } else {
+        None
     };
     if let Some(st) = serialized_tree {
         match prettify(st, args.format, args.name, args.children) {
