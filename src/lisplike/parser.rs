@@ -16,7 +16,7 @@ pub fn parse(tokens: Vec<Token>) -> Result<Node, Error> {
 }
 
 fn parse_iter(token_iter: &mut vec::IntoIter<Token>) -> Result<Vec<Node>, Error> {
-    let mut nodes: Vec<Node> = vec![];
+    let mut nodes: Vec<Node> = Vec::new();
     let mut cur_node: Option<&mut Node> = None;
     while let Some(token) = token_iter.next() {
         match token {
@@ -91,12 +91,12 @@ mod tests {
                         name: "bebe".to_string(),
                         children: vec![Node {
                             name: "gege".to_string(),
-                            children: vec![]
+                            children: Vec::new()
                         }]
                     },
                     Node {
                         name: "fefe".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     }
                 ]
             }

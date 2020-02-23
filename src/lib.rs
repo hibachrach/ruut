@@ -15,7 +15,7 @@ impl Node {
     pub fn new(name: String) -> Node {
         Node {
             name,
-            children: vec![],
+            children: Vec::new(),
         }
     }
 }

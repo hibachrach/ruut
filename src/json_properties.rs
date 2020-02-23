@@ -54,8 +54,8 @@ fn json_value_to_node(
                                 Result::transpose(json_value_to_node(value, name_key, children_key))
                             })
                             .collect::<Result<Vec<_>, _>>(),
-                        None => Ok(vec![]),
-                        _ => Ok(vec![]),
+                        None => Ok(Vec::new()),
+                        _ => Ok(Vec::new()),
                     }?;
                     Ok(Some(Node {
                         name: name.to_string(),
@@ -161,11 +161,11 @@ mod tests {
                 children: vec![
                     Node {
                         name: "me, the bean man".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     },
                     Node {
                         name: "another child of beans".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     }
                 ]
             }
@@ -196,11 +196,11 @@ mod tests {
                 children: vec![
                     Node {
                         name: "me, the bean man".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     },
                     Node {
                         name: "another child of beans".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     }
                 ]
             }
@@ -235,11 +235,11 @@ mod tests {
                 children: vec![
                     Node {
                         name: "me, the bean man".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     },
                     Node {
                         name: "another child of beans".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     }
                 ]
             }

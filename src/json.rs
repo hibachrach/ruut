@@ -123,12 +123,12 @@ mod tests {
                         name: "beans".to_string(),
                         children: vec![Node {
                             name: "man".to_string(),
-                            children: vec![]
+                            children: Vec::new()
                         }]
                     },
                     Node {
                         name: "wow".to_string(),
-                        children: vec![]
+                        children: Vec::new()
                     }
                 ]
             }
