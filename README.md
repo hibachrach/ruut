@@ -1,5 +1,9 @@
 # ruut
 
+[![Build
+Status](https://travis-ci.org/HarrisonB/ruut.svg?branch=master)][ruut-travis]
+[![Crates.io](https://img.shields.io/crates/v/ruut)][ruut-crate]
+
 ## Why
 
 I deal with folder structures a lot for work at [DocSend][docsend]. I also love the
@@ -27,7 +31,7 @@ Parent
 └── Child 3
 ```
 
-It's also good for printing serialized representations of trees (see the
+It's also good for pretty-printing serialized representations of trees (see the
 `format` options below).
 
 ## Usage
@@ -177,8 +181,15 @@ names are ignored:
 }
 ```
 
+## Versioning
+
+This project respects [semantic versioning][semver].
+
+[ruut-travis]: https://travis-ci.org/HarrisonB/ruut
+[ruut-crate]: https://crates.io/crates/ruut
 [docsend]: https://www.docsend.com/
 [tree-wiki]: https://en.wikipedia.org/wiki/Tree_(command) 
 [lisp-parser-python]: https://norvig.com/lispy.html
 [rustup-instructions]: https://rustup.rs/
 [ruut-releases]: https://github.com/HarrisonB/ruut/releases
+[semver]: https://semver.org/
