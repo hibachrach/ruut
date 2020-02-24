@@ -36,13 +36,12 @@ It's also good for pretty-printing serialized representations of trees (see the
 
 ## Usage
 
-`ruut` can either take the "structure" as an argument or, if using the `-i`
-flag, from stdin:
+`ruut` can either take the "structure" as an argument or from stdin:
 
 ```sh
 $ ruut 'Parent (Child 1, Child 2 (Grandchild 1, Grandchild 2), Child 3)'
 # Equivalent to
-$ echo 'Parent (Child 1, Child 2 (Grandchild 1, Grandchild 2), Child 3)' | ruut -i
+$ echo 'Parent (Child 1, Child 2 (Grandchild 1, Grandchild 2), Child 3)' | ruut
 ```
 
 ## Installation
