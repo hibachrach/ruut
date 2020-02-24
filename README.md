@@ -109,7 +109,7 @@ optional.
 Only key names are really relevant here. Note that entities other than objects
 and empty objects are ignored.
 
-### JSON with properties
+### JSON with properties (`-f jsonprop`)
 
 ```json
 {
@@ -179,6 +179,10 @@ names are ignored:
   }
 }
 ```
+
+By default, this format looks for the properties `name` for what to print for
+each item and `children` for what items are immediate descendants. To change
+this, you can use the `--name` and `--children` options, respectively.
 
 ## Versioning
 
