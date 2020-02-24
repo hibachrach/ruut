@@ -6,7 +6,12 @@ use structopt::StructOpt;
 #[derive(StructOpt)]
 struct Cli {
     serialized_tree: Option<String>,
-    #[structopt(short, long, default_value = "lisp")]
+    #[structopt(
+        short,
+        long,
+        default_value = "lisp",
+        raw(possible_values = "&[\"lisp\", \"json\", \"jsonprop\"]")
+    )]
     format: InputFormat,
     /// The property containing the name of the given node
     /// (only applies to `jsonprop` format)
