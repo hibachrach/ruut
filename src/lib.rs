@@ -65,29 +65,35 @@ pub fn prettify(
 
 pub fn node_to_lines(node: &Node) -> Vec<String> {
     let mut lines = vec![node.name.clone()];
-    let children = &node.children;
-    let last_child_idx = if children.len() > 1 {
-        children.len() - 1
-    } else {
-        0
-    };
-    for child in children[0..last_child_idx].iter() {
-        let child_node_lines = node_to_lines(child);
-        if let Some(first_line) = child_node_lines.first() {
-            lines.push(format!("├── {}", first_line));
-        }
-        for line in child_node_lines[1..].iter() {
-            lines.push(format!("│   {}", line));
-        }
-    }
-    if let Some(last_child) = children.last() {
+    let children = &node.children[..];
+    if let Some((last_child, non_last_children)) = children.split_last() {
+        let child_node_lines = non_last_children.iter().flat_map(|child| {
+            node_to_lines(child)
+                .iter()
+                .enumerate()
+                .map(|(idx, child_line)| {
+                    if idx == 0 {
+                        format!("├── {}", child_line)
+                    } else {
+                        format!("│   {}", child_line)
+                    }
+                })
+                .collect::<Vec<String>>()
+        });
         let last_child_node_lines = node_to_lines(last_child);
-        if let Some(first_line) = last_child_node_lines.first() {
-            lines.push(format!("└── {}", first_line));
-        }
-        for line in last_child_node_lines[1..].iter() {
-            lines.push(format!("    {}", line));
-        }
+        let formatted_last_child_node_lines_iter =
+            last_child_node_lines
+                .iter()
+                .enumerate()
+                .map(|(idx, child_line)| {
+                    if idx == 0 {
+                        format!("└── {}", child_line)
+                    } else {
+                        format!("    {}", child_line)
+                    }
+                });
+        let children_lines = child_node_lines.chain(formatted_last_child_node_lines_iter);
+        lines.extend(children_lines);
     }
     lines
 }
