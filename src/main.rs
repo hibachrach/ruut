@@ -1,3 +1,4 @@
+use atty::Stream;
 use exitcode;
 use ruut::{prettify, Error, InputFormat};
 use std::io::{self, BufRead};
@@ -28,11 +29,16 @@ fn main() {
     let stdin = io::stdin();
     let serialized_tree = if let st_arg @ Some(_) = args.serialized_tree {
         st_arg
-    } else if let Some(Ok(first_line_of_stdin)) = stdin.lock().lines().next() {
-        Some(first_line_of_stdin)
+    } else if atty::isnt(Stream::Stdin) {
+        if let Some(Ok(first_line_of_stdin)) = stdin.lock().lines().next() {
+            Some(first_line_of_stdin)
+        } else {
+            None
+        }
     } else {
         None
     };
+
     if let Some(st) = serialized_tree {
         match prettify(st, args.format, args.name, args.children) {
             Ok(prettified) => println!("{}", prettified),

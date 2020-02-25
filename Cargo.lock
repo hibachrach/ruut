@@ -99,6 +99,7 @@ dependencies = [
 name = "ruut"
 version = "0.3.0"
 dependencies = [
+ "atty",
  "exitcode",
  "serde_json",
  "structopt",
