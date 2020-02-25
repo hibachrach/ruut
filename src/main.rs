@@ -1,7 +1,7 @@
 use atty::Stream;
 use exitcode;
 use ruut::{prettify, Error, InputFormat};
-use std::io::{self, BufRead};
+use std::io::{self, Read};
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -26,14 +26,13 @@ struct Cli {
 
 fn main() {
     let args = Cli::from_args();
-    let stdin = io::stdin();
     let serialized_tree = if let st_arg @ Some(_) = args.serialized_tree {
         st_arg
     } else if atty::isnt(Stream::Stdin) {
-        if let Some(Ok(first_line_of_stdin)) = stdin.lock().lines().next() {
-            Some(first_line_of_stdin)
-        } else {
-            None
+        let mut st_stdin = String::new();
+        match io::stdin().read_to_string(&mut st_stdin) {
+            Ok(0) | Err(_) => None,
+            _ => Some(st_stdin),
         }
     } else {
         None
