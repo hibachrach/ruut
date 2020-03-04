@@ -182,7 +182,19 @@ names are ignored:
 
 By default, this format looks for the properties `name` for what to print for
 each item and `children` for what items are immediate descendants. To change
-this, you can use the `--name` and `--children` options, respectively.
+this, you can use the `--template` and `--children` options, respectively.
+
+#### `--template <template_str>`
+
+This option allows you to grab any properties from each JSON node using a simple
+curly brace template syntax. E.g. for a node with the properties `id` = `3`,
+`type` = `"Folder"`, you could write a template string of `Id: {id}, Type:
+{type}` which would result in `Id: 3, Type: Folder`.
+
+#### `--children <children_prop>`
+
+This option allows you to specify the name of the property that contains the
+children JSON nodes, which is `children` by default.
 
 ## Versioning
 
