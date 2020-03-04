@@ -14,10 +14,11 @@ struct Cli {
         raw(possible_values = "&[\"lisp\", \"json\", \"jsonprop\"]")
     )]
     format: InputFormat,
-    /// The property containing the name of the given node
-    /// (only applies to `jsonprop` format)
-    #[structopt(short, long, default_value = "name")]
-    name: String,
+    /// Can be used to customize name of each node, deriving from properties
+    /// (e.g. "this boy's id: {id}" will print `this boy's id = 3` if the id of
+    /// the node is 3; only applies to `jsonprop` format)
+    #[structopt(short, long, default_value = "{name}")]
+    template: String,
     /// The property containing the children of the given node
     /// (only applies to `jsonprop` format)
     #[structopt(short, long, default_value = "children")]
@@ -39,14 +40,14 @@ fn main() {
     };
 
     if let Some(st) = serialized_tree {
-        match prettify(st, args.format, args.name, args.children) {
+        match prettify(st, args.format, args.template, args.children) {
             Ok(prettified) => println!("{}", prettified),
             Err(Error::EmptyInputError) => {
                 eprintln!("Error: empty input -- structure must be passed as the first argument or via stdin");
                 std::process::exit(exitcode::USAGE);
             }
-            Err(Error::MissingNameError) => {
-                eprintln!("Error: invalid input -- an item is missing a name");
+            Err(Error::MissingPropError) => {
+                eprintln!("Error: invalid input -- an item is missing a required property");
                 std::process::exit(exitcode::DATAERR);
             }
             Err(Error::MultipleRootsError) => {

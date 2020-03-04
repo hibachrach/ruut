@@ -1,16 +1,21 @@
+mod template;
+
 use super::{Error, Node};
 use serde_json;
+use serde_json::Map;
 use serde_json::Value as JsonValue;
+use template::Template;
 
 pub fn deserialize(
     serialized: String,
-    name_key: String,
+    template_str: String,
     children_key: String,
 ) -> Result<Node, Error> {
     if serialized.trim().is_empty() {
         return Err(Error::EmptyInputError);
     }
     let root_value: JsonValue = serde_json::from_str(&serialized)?;
+    let template = Template::new(template_str)?;
     match root_value {
         JsonValue::Array(vec) => {
             if vec.len() > 1 {
@@ -19,12 +24,12 @@ pub fn deserialize(
                 Err(Error::EmptyInputError)
             } else {
                 let root_obj = vec.iter().next().unwrap();
-                json_value_to_node(root_obj, &name_key, &children_key)?
+                json_value_to_node(root_obj, &template, &children_key)?
                     .ok_or(Error::EmptyInputError)
             }
         }
         root_obj @ JsonValue::Object(_) => {
-            json_value_to_node(&root_obj, &name_key, &children_key)?.ok_or(Error::EmptyInputError)
+            json_value_to_node(&root_obj, &template, &children_key)?.ok_or(Error::EmptyInputError)
         }
         _ => Err(Error::FormatSpecificError(
             "root item must be a root object or an array containing a root object".to_string(),
@@ -34,42 +39,51 @@ pub fn deserialize(
 
 fn json_value_to_node(
     value: &JsonValue,
-    name_key: &str,
+    template: &Template,
     children_key: &str,
 ) -> Result<Option<Node>, Error> {
     match value {
-        JsonValue::Object(map) => match map.get(name_key) {
-            Some(name_value) => match name_value {
-                JsonValue::String(name) => {
-                    let children = match map.get(children_key) {
-                        Some(JsonValue::Object(children_json_values)) => children_json_values
-                            .values()
-                            .flat_map(|value| {
-                                Result::transpose(json_value_to_node(value, name_key, children_key))
-                            })
-                            .collect::<Result<Vec<_>, _>>(),
-                        Some(JsonValue::Array(children_json_values)) => children_json_values
-                            .iter()
-                            .flat_map(|value| {
-                                Result::transpose(json_value_to_node(value, name_key, children_key))
-                            })
-                            .collect::<Result<Vec<_>, _>>(),
-                        None => Ok(Vec::new()),
-                        _ => Ok(Vec::new()),
-                    }?;
-                    Ok(Some(Node {
-                        name: name.to_string(),
-                        children,
-                    }))
-                }
-                _ => Err(Error::FormatSpecificError(
-                    "`name` must be a string".to_string(),
-                )),
-            },
-            None => Err(Error::MissingNameError),
-        },
+        JsonValue::Object(map) => {
+            let name = get_name(template, map)?;
+            let children = match map.get(children_key) {
+                Some(JsonValue::Object(children_json_values)) => children_json_values
+                    .values()
+                    .flat_map(|value| {
+                        Result::transpose(json_value_to_node(value, template, children_key))
+                    })
+                    .collect::<Result<Vec<_>, _>>(),
+                Some(JsonValue::Array(children_json_values)) => children_json_values
+                    .iter()
+                    .flat_map(|value| {
+                        Result::transpose(json_value_to_node(value, template, children_key))
+                    })
+                    .collect::<Result<Vec<_>, _>>(),
+                None => Ok(Vec::new()),
+                _ => Ok(Vec::new()),
+            }?;
+            Ok(Some(Node { name, children }))
+        }
         _ => Ok(None),
     }
+}
+
+fn get_name(template: &Template, map: &Map<String, JsonValue>) -> Result<String, Error> {
+    template.fill(|placeholder_name| {
+        map.get(placeholder_name)
+            .ok_or(Error::FormatSpecificError(
+                "missing template value".to_string(),
+            ))
+            .map(|v| {
+                format!(
+                    "{}",
+                    if let JsonValue::String(s) = v {
+                        s.to_string()
+                    } else {
+                        v.to_string()
+                    }
+                )
+            })
+    })
 }
 
 #[cfg(test)]
@@ -89,8 +103,12 @@ mod tests {
                 "another one": null
             }
         "#;
-        let deserialization_err =
-            deserialize(json.to_string(), "name".to_string(), "children".to_string()).unwrap_err();
+        let deserialization_err = deserialize(
+            json.to_string(),
+            "{name}".to_string(),
+            "children".to_string(),
+        )
+        .unwrap_err();
         let is_format_error = if let Error::FormatSpecificError(_) = deserialization_err {
             true
         } else {
@@ -102,17 +120,28 @@ mod tests {
     #[test]
     fn zero_length_json() {
         let json = r#""#;
-        let deserialization_err =
-            deserialize(json.to_string(), "name".to_string(), "children".to_string()).unwrap_err();
+        let deserialization_err = deserialize(
+            json.to_string(),
+            "{name}".to_string(),
+            "children".to_string(),
+        )
+        .unwrap_err();
         assert_eq!(deserialization_err, Error::EmptyInputError);
     }
 
     #[test]
     fn empty_object_json() {
         let json = r#"{}"#;
-        let deserialization_err =
-            deserialize(json.to_string(), "name".to_string(), "children".to_string()).unwrap_err();
-        assert_eq!(deserialization_err, Error::MissingNameError);
+        let deserialization_err = deserialize(
+            json.to_string(),
+            "{name}".to_string(),
+            "children".to_string(),
+        )
+        .unwrap_err();
+        assert_eq!(
+            deserialization_err,
+            Error::FormatSpecificError("missing template value".to_string())
+        );
     }
 
     #[test]
@@ -152,8 +181,12 @@ mod tests {
                 ]
             }
         "#;
-        let root_node =
-            deserialize(json.to_string(), "name".to_string(), "children".to_string()).unwrap();
+        let root_node = deserialize(
+            json.to_string(),
+            "{name}".to_string(),
+            "children".to_string(),
+        )
+        .unwrap();
         assert_eq!(
             root_node,
             Node {
@@ -187,8 +220,12 @@ mod tests {
                 ]
             }]
         "#;
-        let root_node =
-            deserialize(json.to_string(), "name".to_string(), "children".to_string()).unwrap();
+        let root_node = deserialize(
+            json.to_string(),
+            "{name}".to_string(),
+            "children".to_string(),
+        )
+        .unwrap();
         assert_eq!(
             root_node,
             Node {
@@ -224,7 +261,7 @@ mod tests {
         "#;
         let root_node = deserialize(
             json.to_string(),
-            "moniker".to_string(),
+            "{moniker}".to_string(),
             "progeny".to_string(),
         )
         .unwrap();

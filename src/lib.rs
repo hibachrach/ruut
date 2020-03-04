@@ -42,7 +42,7 @@ impl FromStr for InputFormat {
 #[derive(Debug, PartialEq)]
 pub enum Error {
     EmptyInputError,
-    MissingNameError,
+    MissingPropError,
     MultipleRootsError,
     FormatSpecificError(String),
 }
@@ -50,14 +50,14 @@ pub enum Error {
 pub fn prettify(
     serialized: String,
     format: InputFormat,
-    name_key: String,
+    template: String,
     children_key: String,
 ) -> Result<String, Error> {
     let root = match format {
         InputFormat::LispLike => lisplike::deserialize(serialized),
         InputFormat::Json => json::deserialize(serialized),
         InputFormat::JsonProperties => {
-            json_properties::deserialize(serialized, name_key, children_key)
+            json_properties::deserialize(serialized, template, children_key)
         }
     }?;
     Ok(node_to_lines(&root).join("\n"))

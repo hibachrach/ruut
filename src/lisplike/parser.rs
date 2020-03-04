@@ -25,7 +25,7 @@ fn parse_iter(token_iter: &mut vec::IntoIter<Token>) -> Result<Vec<Node>, Error>
                     let mut children = parse_iter(token_iter)?;
                     node.children.append(&mut children);
                 } else {
-                    return Err(Error::MissingNameError);
+                    return Err(Error::MissingPropError);
                 }
             }
             Token::ParenClose => {
