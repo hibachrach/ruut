@@ -1,6 +1,7 @@
 mod template;
 
 use super::{Error, Node};
+use json5;
 use serde_json;
 use serde_json::Map;
 use serde_json::Value as JsonValue;
@@ -15,7 +16,7 @@ pub fn deserialize(
     if serialized.trim().is_empty() {
         return Err(Error::EmptyInputError);
     }
-    let root_value: JsonValue = serde_json::from_str(&serialized)?;
+    let root_value: JsonValue = json5::from_str(&serialized)?;
     let template = Template::new(template_str)?;
     match root_value {
         JsonValue::Array(vec) => {

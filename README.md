@@ -109,6 +109,11 @@ optional.
 Only key names are really relevant here. Note that entities other than objects
 and empty objects are ignored.
 
+Note that all [JSON5][json5] syntax is accepted. JSON5 is a superset of JSON
+with support for different types of quotes, comments, etc., so you can much more
+easily copy from an actual JavaScript environment. See the [JSON5
+website][json5] for more details.
+
 ### JSON with properties (`-f jsonprop`)
 
 ```json
@@ -180,6 +185,11 @@ names are ignored:
 }
 ```
 
+Note that all [JSON5][json5] syntax is accepted. JSON5 is a superset of JSON
+with support for different types of quotes, comments, etc., so you can much more
+easily copy from an actual JavaScript environment. See the [JSON5
+website][json5] for more details.
+
 By default, this format looks for the properties `name` for what to print for
 each item and `children` for what items are immediate descendants. To change
 this, you can use the `--template` and `--children` options, respectively.
@@ -214,4 +224,5 @@ This project respects [semantic versioning][semver].
 [lisp-parser-python]: https://norvig.com/lispy.html
 [rustup-instructions]: https://rustup.rs/
 [ruut-releases]: https://github.com/HarrisonB/ruut/releases
+[json5]: https://json5.org/
 [semver]: https://semver.org/

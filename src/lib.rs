@@ -47,6 +47,12 @@ pub enum Error {
     FormatSpecificError(String),
 }
 
+impl From<json5::Error> for Error {
+    fn from(serde_error: json5::Error) -> Error {
+        Error::FormatSpecificError(format!("{}", serde_error))
+    }
+}
+
 pub fn prettify(
     serialized: String,
     format: InputFormat,
