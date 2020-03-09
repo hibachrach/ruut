@@ -10,6 +10,7 @@ pub fn deserialize(
     serialized: String,
     template_str: String,
     children_key: String,
+    default: Option<String>,
 ) -> Result<Node, Error> {
     if serialized.trim().is_empty() {
         return Err(Error::EmptyInputError);
@@ -24,12 +25,13 @@ pub fn deserialize(
                 Err(Error::EmptyInputError)
             } else {
                 let root_obj = vec.iter().next().unwrap();
-                json_value_to_node(root_obj, &template, &children_key)?
+                json_value_to_node(root_obj, &template, &children_key, &default)?
                     .ok_or(Error::EmptyInputError)
             }
         }
         root_obj @ JsonValue::Object(_) => {
-            json_value_to_node(&root_obj, &template, &children_key)?.ok_or(Error::EmptyInputError)
+            json_value_to_node(&root_obj, &template, &children_key, &default)?
+                .ok_or(Error::EmptyInputError)
         }
         _ => Err(Error::FormatSpecificError(
             "root item must be a root object or an array containing a root object".to_string(),
@@ -41,21 +43,32 @@ fn json_value_to_node(
     value: &JsonValue,
     template: &Template,
     children_key: &str,
+    default: &Option<String>,
 ) -> Result<Option<Node>, Error> {
     match value {
         JsonValue::Object(map) => {
-            let name = get_name(template, map)?;
+            let name = get_name(template, map, default)?;
             let children = match map.get(children_key) {
                 Some(JsonValue::Object(children_json_values)) => children_json_values
                     .values()
                     .flat_map(|value| {
-                        Result::transpose(json_value_to_node(value, template, children_key))
+                        Result::transpose(json_value_to_node(
+                            value,
+                            template,
+                            children_key,
+                            default,
+                        ))
                     })
                     .collect::<Result<Vec<_>, _>>(),
                 Some(JsonValue::Array(children_json_values)) => children_json_values
                     .iter()
                     .flat_map(|value| {
-                        Result::transpose(json_value_to_node(value, template, children_key))
+                        Result::transpose(json_value_to_node(
+                            value,
+                            template,
+                            children_key,
+                            default,
+                        ))
                     })
                     .collect::<Result<Vec<_>, _>>(),
                 None => Ok(Vec::new()),
@@ -67,12 +80,14 @@ fn json_value_to_node(
     }
 }
 
-fn get_name(template: &Template, map: &Map<String, JsonValue>) -> Result<String, Error> {
+fn get_name(
+    template: &Template,
+    map: &Map<String, JsonValue>,
+    default: &Option<String>,
+) -> Result<String, Error> {
+    // Option<&String> -> Option<&JsonValue::Value<String>>
     template.fill(|placeholder_name| {
         map.get(placeholder_name)
-            .ok_or(Error::FormatSpecificError(
-                "missing template value".to_string(),
-            ))
             .map(|v| {
                 format!(
                     "{}",
@@ -83,6 +98,10 @@ fn get_name(template: &Template, map: &Map<String, JsonValue>) -> Result<String,
                     }
                 )
             })
+            .or_else(|| default.clone())
+            .ok_or(Error::FormatSpecificError(
+                "missing template value".to_string(),
+            ))
     })
 }
 
@@ -107,6 +126,7 @@ mod tests {
             json.to_string(),
             "{name}".to_string(),
             "children".to_string(),
+            None,
         )
         .unwrap_err();
         let is_format_error = if let Error::FormatSpecificError(_) = deserialization_err {
@@ -124,6 +144,7 @@ mod tests {
             json.to_string(),
             "{name}".to_string(),
             "children".to_string(),
+            None,
         )
         .unwrap_err();
         assert_eq!(deserialization_err, Error::EmptyInputError);
@@ -136,6 +157,7 @@ mod tests {
             json.to_string(),
             "{name}".to_string(),
             "children".to_string(),
+            None,
         )
         .unwrap_err();
         assert_eq!(
@@ -161,8 +183,13 @@ mod tests {
                 }
             ]
         "#;
-        let deserialization_err =
-            deserialize(json.to_string(), "name".to_string(), "children".to_string()).unwrap_err();
+        let deserialization_err = deserialize(
+            json.to_string(),
+            "name".to_string(),
+            "children".to_string(),
+            None,
+        )
+        .unwrap_err();
         assert_eq!(deserialization_err, Error::MultipleRootsError);
     }
 
@@ -185,6 +212,7 @@ mod tests {
             json.to_string(),
             "{name}".to_string(),
             "children".to_string(),
+            None,
         )
         .unwrap();
         assert_eq!(
@@ -224,6 +252,7 @@ mod tests {
             json.to_string(),
             "{name}".to_string(),
             "children".to_string(),
+            None,
         )
         .unwrap();
         assert_eq!(
@@ -263,6 +292,7 @@ mod tests {
             json.to_string(),
             "{moniker}".to_string(),
             "progeny".to_string(),
+            None,
         )
         .unwrap();
         assert_eq!(
@@ -281,5 +311,73 @@ mod tests {
                 ]
             }
         );
+    }
+    #[test]
+    fn json_with_missing_prop_no_default() {
+        let json = r#"
+            {
+                "other_thing": "other thing value",
+                "not_in_all_of_them": "sassy kid",
+                "children": [
+                    {
+                        "other_thing": "other thing value 2",
+                        "not_in_all_of_them": "sassy kid 2"
+                    },
+                    {
+                        "other_thing": "other thing value 3"
+                    }
+                ]
+            }
+        "#;
+        let deserialization_err = deserialize(
+            json.to_string(),
+            "{other_thing}: {not_in_all_of_them}".to_string(),
+            "children".to_string(),
+            None,
+        )
+        .unwrap_err();
+        assert_eq!(
+            deserialization_err,
+            Error::FormatSpecificError("missing template value".to_string())
+        );
+    }
+    #[test]
+    fn json_with_missing_prop_with_default() {
+        let json = r#"
+            {
+                "other_thing": "other thing value",
+                "not_in_all_of_them": "sassy kid",
+                "children": [
+                    {
+                        "other_thing": "other thing value 2",
+                        "not_in_all_of_them": "sassy kid 2"
+                    },
+                    {
+                        "other_thing": "other thing value 3"
+                    }
+                ]
+            }
+        "#;
+        let root_node = deserialize(
+            json.to_string(),
+            "{other_thing}: {not_in_all_of_them}".to_string(),
+            "children".to_string(),
+            Some("<u fucked up>".to_string()),
+        )
+        .unwrap();
+        let expected_root_node = Node {
+            name: "other thing value: sassy kid".to_string(),
+            children: vec![
+                Node {
+                    name: "other thing value 2: sassy kid 2".to_string(),
+                    children: Vec::new(),
+                },
+                Node {
+                    name: "other thing value 3: <u fucked up>".to_string(),
+                    children: Vec::new(),
+                },
+            ],
+        };
+        assert_eq!(root_node, expected_root_node);
     }
 }

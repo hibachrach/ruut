@@ -52,12 +52,13 @@ pub fn prettify(
     format: InputFormat,
     template: String,
     children_key: String,
+    default: Option<String>,
 ) -> Result<String, Error> {
     let root = match format {
         InputFormat::LispLike => lisplike::deserialize(serialized),
         InputFormat::Json => json::deserialize(serialized),
         InputFormat::JsonProperties => {
-            json_properties::deserialize(serialized, template, children_key)
+            json_properties::deserialize(serialized, template, children_key, default)
         }
     }?;
     Ok(node_to_lines(&root).join("\n"))

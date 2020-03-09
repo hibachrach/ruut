@@ -23,6 +23,10 @@ struct Cli {
     /// (only applies to `jsonprop` format)
     #[structopt(short, long, default_value = "children")]
     children: String,
+    /// Raise an error if a property used in the template is missing (only
+    /// applies to `jsonprop` format)
+    #[structopt(short, long = "raise-on-missing")]
+    raise_on_missing_prop: bool,
 }
 
 fn main() {
@@ -39,8 +43,14 @@ fn main() {
         None
     };
 
+    let default = if args.raise_on_missing_prop {
+        None
+    } else {
+        Some("<missing>".to_string())
+    };
+
     if let Some(st) = serialized_tree {
-        match prettify(st, args.format, args.template, args.children) {
+        match prettify(st, args.format, args.template, args.children, default) {
             Ok(prettified) => println!("{}", prettified),
             Err(Error::EmptyInputError) => {
                 eprintln!("Error: empty input -- structure must be passed as the first argument or via stdin");
