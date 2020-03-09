@@ -1,6 +1,6 @@
 [package]
 name = "ruut"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["Harry Bachrach <harrison.bachrach@gmail.com>"]
 edition = "2018"
 license = "MIT"
