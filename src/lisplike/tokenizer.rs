@@ -40,7 +40,7 @@ pub fn tokenize(serialized: &str) -> Vec<Token> {
             }
         }
     }
-    if !cur_name.is_empty() {
+    if !cur_name.trim().is_empty() {
         tokens.push(Token::Name(cur_name));
     }
     tokens
@@ -71,6 +71,20 @@ mod tests {
     fn simple_multiple() {
         assert_eq!(
             tokenize("(cool beans, better beans)"),
+            vec![
+                Token::ParenOpen,
+                Token::Name("cool beans".to_string()),
+                Token::Comma,
+                Token::Name("better beans".to_string()),
+                Token::ParenClose
+            ]
+        );
+    }
+
+    #[test]
+    fn simple_newlines() {
+        assert_eq!(
+            tokenize("(cool beans,\nbetter beans)\n"),
             vec![
                 Token::ParenOpen,
                 Token::Name("cool beans".to_string()),
