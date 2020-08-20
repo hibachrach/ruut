@@ -10,8 +10,8 @@ struct Cli {
     #[structopt(
         short,
         long,
-        default_value = "lisp",
-        raw(possible_values = "&[\"lisp\", \"json\", \"jsonprop\"]")
+        default_value = "parens",
+        raw(possible_values = "&[\"parens\", \"json\", \"jsonprop\"]")
     )]
     format: InputFormat,
     /// Can be used to customize name of each node, deriving from properties

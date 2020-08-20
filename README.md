@@ -69,7 +69,7 @@ Parent
     └── Grandchild 3
 ```
 
-### Lisp-like (`-f lisp`, default)
+### Parens (`-f parens`, default)
 
 ```
 Parent (Child 1, Child 2 (Grandchild 1, Grandchild 2), Child 3 (Grandchild 3))
