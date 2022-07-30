@@ -1,7 +1,6 @@
 # ruut
 
-[![Build
-Status](https://travis-ci.org/HarrisonB/ruut.svg?branch=master)][ruut-travis]
+[![Run tests](https://github.com/HarrisonB/ruut/actions/workflows/run-tests.yml/badge.svg)][run-tests-workflow]
 [![Crates.io](https://img.shields.io/crates/v/ruut)][ruut-crate]
 
 ## Why
@@ -226,3 +225,4 @@ This project respects [semantic versioning][semver].
 [ruut-releases]: https://github.com/HarrisonB/ruut/releases
 [json5]: https://json5.org/
 [semver]: https://semver.org/
+[run-tests-workflow]: https://github.com/HarrisonB/ruut/actions/workflows/run-tests.yml
