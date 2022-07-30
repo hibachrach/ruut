@@ -1,0 +1,16 @@
+name: Run tests
+
+on: push
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: cargo test --verbose
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: rustup component add rustfmt
+      - run: cargo fmt -- --check
