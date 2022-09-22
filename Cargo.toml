@@ -1,11 +1,11 @@
 [package]
 name = "ruut"
 version = "0.7.0"
-authors = ["Harry Bachrach <harrison.bachrach@gmail.com>"]
+authors = ["Hazel Bachrach <bachrach.hazel@gmail.com>"]
 edition = "2018"
 license = "MIT"
 description = "Make easy-to-type and easy-to-grab folder structures easy to read"
-repository = "https://github.com/HarrisonB/ruut"
+repository = "https://github.com/hibachrach/ruut"
 readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

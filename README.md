@@ -1,6 +1,6 @@
 # ruut
 
-[![Run tests](https://github.com/HarrisonB/ruut/actions/workflows/run-tests.yml/badge.svg)][run-tests-workflow]
+[![Run tests](https://github.com/hibachrach/ruut/actions/workflows/run-tests.yml/badge.svg)][run-tests-workflow]
 [![Crates.io](https://img.shields.io/crates/v/ruut)][ruut-crate]
 
 ## Why
@@ -216,13 +216,12 @@ in the template are missing.
 
 This project respects [semantic versioning][semver].
 
-[ruut-travis]: https://travis-ci.org/HarrisonB/ruut
 [ruut-crate]: https://crates.io/crates/ruut
 [docsend]: https://www.docsend.com/
 [tree-wiki]: https://en.wikipedia.org/wiki/Tree_(command) 
 [lisp-parser-python]: https://norvig.com/lispy.html
 [rustup-instructions]: https://rustup.rs/
-[ruut-releases]: https://github.com/HarrisonB/ruut/releases
+[ruut-releases]: https://github.com/hibachrach/ruut/releases
 [json5]: https://json5.org/
 [semver]: https://semver.org/
-[run-tests-workflow]: https://github.com/HarrisonB/ruut/actions/workflows/run-tests.yml
+[run-tests-workflow]: https://github.com/hibachrach/ruut/actions/workflows/run-tests.yml
