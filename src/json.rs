@@ -1,5 +1,4 @@
 use super::{Error, Node};
-use json5;
 use serde_json::Value as JsonValue;
 
 pub fn deserialize(serialized: String) -> Result<Node, Error> {
@@ -55,11 +54,7 @@ mod tests {
             }
         "#;
         let deserialization_err = deserialize(json.to_string()).unwrap_err();
-        let is_format_error = if let Error::FormatSpecificError(_) = deserialization_err {
-            true
-        } else {
-            false
-        };
+        let is_format_error = matches!(deserialization_err, Error::FormatSpecificError(_));
         assert!(is_format_error);
     }
 

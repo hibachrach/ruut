@@ -1,5 +1,4 @@
 use atty::Stream;
-use exitcode;
 use ruut::{prettify, Error, InputFormat};
 use std::io::{self, Read};
 use structopt::StructOpt;

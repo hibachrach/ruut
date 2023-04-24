@@ -1,8 +1,6 @@
 mod template;
 
 use super::{Error, Node};
-use json5;
-use serde_json;
 use serde_json::Map;
 use serde_json::Value as JsonValue;
 use template::Template;
@@ -25,7 +23,7 @@ pub fn deserialize(
             } else if vec.is_empty() {
                 Err(Error::EmptyInputError)
             } else {
-                let root_obj = vec.iter().next().unwrap();
+                let root_obj = vec.first().unwrap();
                 json_value_to_node(root_obj, &template, &children_key, &default)?
                     .ok_or(Error::EmptyInputError)
             }
@@ -90,14 +88,11 @@ fn get_name(
     template.fill(|placeholder_name| {
         map.get(placeholder_name)
             .map(|v| {
-                format!(
-                    "{}",
-                    if let JsonValue::String(s) = v {
-                        s.to_string()
-                    } else {
-                        v.to_string()
-                    }
-                )
+                if let JsonValue::String(s) = v {
+                    s.to_string()
+                } else {
+                    v.to_string()
+                }
             })
             .or_else(|| default.clone())
             .ok_or(Error::FormatSpecificError(
@@ -130,11 +125,7 @@ mod tests {
             None,
         )
         .unwrap_err();
-        let is_format_error = if let Error::FormatSpecificError(_) = deserialization_err {
-            true
-        } else {
-            false
-        };
+        let is_format_error = matches!(deserialization_err, Error::FormatSpecificError(_));
         assert!(is_format_error);
     }
 
