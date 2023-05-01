@@ -33,6 +33,9 @@ Parent
 It's also good for pretty-printing serialized representations of trees (see the
 `format` options below).
 
+**NOTE:** If you're looking to just render things with that tree style shown
+above from a Rust program, take a look at [render_as_tree][render_as_tree].
+
 ## Usage
 
 `ruut` can either take the "structure" as an argument or from stdin:
@@ -225,3 +228,4 @@ This project respects [semantic versioning][semver].
 [json5]: https://json5.org/
 [semver]: https://semver.org/
 [run-tests-workflow]: https://github.com/hibachrach/ruut/actions/workflows/run-tests.yml
+[render_as_tree]: https://github.com/hibachrach/render_as_tree
