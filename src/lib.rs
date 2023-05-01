@@ -20,6 +20,16 @@ impl Node {
     }
 }
 
+impl render_as_tree::Node for Node {
+    type Iter<'a> = std::slice::Iter<'a, Self>;
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn children(&self) -> Self::Iter<'_> {
+        self.children.iter()
+    }
+}
+
 pub enum InputFormat {
     Parens,
     Json,
@@ -67,40 +77,5 @@ pub fn prettify(
             json_properties::deserialize(serialized, template, children_key, default)
         }
     }?;
-    Ok(node_to_lines(&root).join("\n"))
-}
-
-pub fn node_to_lines(node: &Node) -> Vec<String> {
-    let mut lines = vec![node.name.clone()];
-    let children = &node.children[..];
-    if let Some((last_child, non_last_children)) = children.split_last() {
-        let child_node_lines = non_last_children.iter().flat_map(|child| {
-            node_to_lines(child)
-                .iter()
-                .enumerate()
-                .map(|(idx, child_line)| {
-                    if idx == 0 {
-                        format!("├── {}", child_line)
-                    } else {
-                        format!("│   {}", child_line)
-                    }
-                })
-                .collect::<Vec<String>>()
-        });
-        let last_child_node_lines = node_to_lines(last_child);
-        let formatted_last_child_node_lines_iter =
-            last_child_node_lines
-                .iter()
-                .enumerate()
-                .map(|(idx, child_line)| {
-                    if idx == 0 {
-                        format!("└── {}", child_line)
-                    } else {
-                        format!("    {}", child_line)
-                    }
-                });
-        let children_lines = child_node_lines.chain(formatted_last_child_node_lines_iter);
-        lines.extend(children_lines);
-    }
-    lines
+    Ok(render_as_tree::render(&root).join("\n"))
 }
